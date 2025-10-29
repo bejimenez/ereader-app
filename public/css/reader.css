@@ -1,0 +1,399 @@
+/* Reader Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --reader-background: #ffffff;
+    --reader-text: #333333;
+    --header-background: #2c3e50;
+    --control-background: rgba(0, 0, 0, 0.8);
+    --control-text: #ffffff;
+}
+
+/* Theme variations */
+body.theme-sepia {
+    --reader-background: #f4ecd8;
+    --reader-text: #5c4b37;
+}
+
+body.theme-dark {
+    --reader-background: #1a1a1a;
+    --reader-text: #e0e0e0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--reader-background);
+    color: var(--reader-text);
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+.reader-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+.reader-header {
+    background: var(--header-background);
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.book-info {
+    flex: 1;
+    text-align: center;
+    padding: 0 10px;
+    overflow: hidden;
+}
+
+.book-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-author {
+    display: block;
+    font-size: 12px;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+/* Reader Menu */
+.reader-menu {
+    position: fixed;
+    top: 60px;
+    right: 0;
+    width: 300px;
+    max-width: 80%;
+    height: calc(100vh - 60px);
+    background: var(--reader-background);
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 99;
+    overflow-y: auto;
+    transition: transform 0.3s;
+}
+
+.reader-menu.hidden {
+    transform: translateX(100%);
+}
+
+.menu-section {
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.menu-section h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: var(--reader-text);
+}
+
+.setting-item {
+    margin-bottom: 15px;
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--reader-text);
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.button-group button {
+    padding: 8px 12px;
+    background: var(--control-background);
+    color: var(--control-text);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#fontSizeValue {
+    min-width: 50px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.theme-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.theme-btn.active {
+    outline: 2px solid var(--control-background);
+}
+
+#flowSelect {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--reader-background);
+    color: var(--reader-text);
+}
+
+/* Content Area */
+.content-area {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    background: var(--reader-background);
+}
+
+/* EPUB Viewer */
+#epubViewer {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* PDF Viewer */
+#pdfCanvas {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+}
+
+.pdf-text-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    opacity: 0;
+    line-height: 1;
+}
+
+/* Reader Controls */
+.reader-controls {
+    background: var(--control-background);
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    z-index: 100;
+}
+
+.nav-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--control-text);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+}
+
+.nav-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.progress-info {
+    flex: 1;
+    text-align: center;
+    color: var(--control-text);
+}
+
+.progress-info span {
+    font-size: 14px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #3498db;
+    transition: width 0.3s;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 200;
+}
+
+.loading-indicator.hidden {
+    display: none;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Table of Contents */
+#tocContainer {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.toc-item {
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--reader-text);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: padding-left 0.2s;
+}
+
+.toc-item:hover {
+    padding-left: 10px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.toc-item.level-1 {
+    font-weight: 600;
+}
+
+.toc-item.level-2 {
+    padding-left: 20px;
+}
+
+.toc-item.level-3 {
+    padding-left: 40px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .reader-menu {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .book-info {
+        font-size: 12px;
+    }
+    
+    .nav-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+}
+
+/* Touch Zones for Navigation */
+.touch-nav-zone {
+    position: fixed;
+    top: 60px;
+    bottom: 60px;
+    width: 30%;
+    z-index: 50;
+    cursor: pointer;
+}
+
+.touch-nav-zone.prev {
+    left: 0;
+}
+
+.touch-nav-zone.next {
+    right: 0;
+}
+
+/* Hide scrollbar for cleaner reading */
+.content-area::-webkit-scrollbar {
+    width: 4px;
+}
+
+.content-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+/* Fullscreen mode adjustments */
+.fullscreen .reader-header,
+.fullscreen .reader-controls {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.fullscreen:hover .reader-header,
+.fullscreen:hover .reader-controls {
+    opacity: 1;
+}

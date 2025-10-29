@@ -1,0 +1,18 @@
+[Unit]
+Description=Personal E-Reader Application
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/root/ereader-app
+ExecStart=/usr/bin/node /home/root/ereader-app/server.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=ereader-app
+
+[Install]
+WantedBy=multi-user.target
+

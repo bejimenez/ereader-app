@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Secret Smut Collection</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Library</h1>
+            <div class="stats" id="stats">
+                <span class="stat-item">Loading...</span>
+            </div>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search books, authors, tags..." autocomplete="off">
+            <button id="filterBtn" class="filter-btn">⚙️ Filters</button>
+        </div>
+
+        <div id="filterPanel" class="filter-panel hidden">
+            <div class="filter-group">
+                <label>Author:</label>
+                <input type="text" id="authorFilter" placeholder="Filter by author">
+            </div>
+            <div class="filter-group">
+                <label>Series:</label>
+                <input type="text" id="seriesFilter" placeholder="Filter by series">
+            </div>
+            <div class="filter-group">
+                <label>Tag:</label>
+                <input type="text" id="tagFilter" placeholder="Filter by tag">
+            </div>
+            <div class="filter-group">
+                <label>Format:</label>
+                <select id="formatFilter">
+                    <option value="">All</option>
+                    <option value="pdf">PDF</option>
+                    <option value="epub">EPUB</option>
+                </select>
+            </div>
+            <button id="clearFilters" class="btn-secondary">Clear Filters</button>
+        </div>
+
+        <div class="sort-bar">
+            <select id="sortSelect">
+                <option value="recent">Recently Added</option>
+                <option value="title">Title A-Z</option>
+                <option value="author">Author A-Z</option>
+            </select>
+        </div>
+
+        <div id="booksList" class="books-grid">
+            <% if (books && books.length > 0) { %>
+                <% books.forEach(book => { %>
+                    <div class="book-card" data-book-id="<%= book.id %>">
+                        <div class="book-cover">
+                            <% if (book.cover) { %>
+                                <img src="/calibre-library/<%= book.cover %>" 
+                                     alt="<%= book.title %>" 
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.src='/img/default-cover.png';">
+                            <% } else { %>
+                                <div class="default-cover">
+                                    <span class="book-title-cover"><%= book.title %></span>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="book-info">
+                            <h3 class="book-title"><%= book.title %></h3>
+                            <% if (book.authors && book.authors.length > 0) { %>
+                                <p class="book-author"><%= book.authors.join(', ') %></p>
+                            <% } %>
+                            <% if (book.series) { %>
+                                <p class="book-series"><%= book.series %> 
+                                    <% if (book.series_index) { %>
+                                        #<%= book.series_index %>
+                                    <% } %>
+                                </p>
+                            <% } %>
+                            <div class="book-formats">
+                                <% Object.keys(book.formats).forEach(format => { %>
+                                    <a href="/reader/<%= book.id %>/<%= format %>" 
+                                       class="format-btn <%= format %>">
+                                        <%= format.toUpperCase() %>
+                                    </a>
+                                <% }); %>
+                            </div>
+                            <% if (book.tags && book.tags.length > 0) { %>
+                                <div class="book-tags">
+                                    <% book.tags.slice(0, 3).forEach(tag => { %>
+                                        <span class="tag"><%= tag %></span>
+                                    <% }); %>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="no-books">
+                    <p>No books found in your library</p>
+                    <p>Sync your Calibre library to get started!</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
+

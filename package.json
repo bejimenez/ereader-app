@@ -1,0 +1,28 @@
+{
+  "name": "ereader-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "setup": "bash setup.sh",
+    "sync": "bash sync-calibre.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "epub2": "^3.0.2",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "fuse.js": "^7.1.0",
+    "multer": "^2.0.2",
+    "pdf-lib": "^1.17.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

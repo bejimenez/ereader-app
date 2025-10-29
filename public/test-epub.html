@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPUB Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://unpkg.com/epubjs@0.3.93/dist/epub.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        #viewer {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        #status {
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>EPUB Reader Test</h1>
+    <div id="status">Ready to test...</div>
+    
+    <div>
+        <label>Enter Book ID: </label>
+        <input type="text" id="bookId" placeholder="Enter book ID">
+        <button onclick="checkEpub()">Check EPUB File</button>
+        <button onclick="loadEpub()">Load EPUB</button>
+    </div>
+    
+    <div id="viewer"></div>
+    
+    <div>
+        <button onclick="prevPage()">Previous Page</button>
+        <button onclick="nextPage()">Next Page</button>
+    </div>
+
+    <script>
+        let rendition;
+        const statusEl = document.getElementById('status');
+        
+        function log(message, isError = false) {
+            console.log(message);
+            statusEl.innerHTML += `<div class="${isError ? 'error' : ''}">${new Date().toLocaleTimeString()}: ${message}</div>`;
+        }
+        
+        async function checkEpub() {
+            const bookId = document.getElementById('bookId').value;
+            if (!bookId) {
+                log('Please enter a book ID', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/check-epub/${bookId}`);
+                const data = await response.json();
+                
+                log(`Book: ${data.title || 'Unknown'}`);
+                log(`Has EPUB: ${data.hasEpub ? 'Yes' : 'No'}`);
+                if (data.hasEpub) {
+                    log(`Path: ${data.epubPath}`);
+                    log(`File exists: ${data.fileExists ? 'Yes' : 'No'}`);
+                    if (data.fileExists) {
+                        log(`File size: ${(data.fileSize / 1024 / 1024).toFixed(2)} MB`);
+                    }
+                }
+                if (data.error) {
+                    log(`Error: ${data.error}`, true);
+                }
+            } catch (error) {
+                log(`Check failed: ${error.message}`, true);
+            }
+        }
+        
+        function loadEpub() {
+            const bookId = document.getElementById('bookId').value;
+            if (!bookId) {
+                log('Please enter a book ID', true);
+                return;
+            }
+            
+            log('Loading EPUB...');
+            
+            // Try different path formats
+            const paths = [
+                `/epub/${bookId}`,
+                `/calibre-library/${bookId}/book.epub`,
+                // Add more path patterns if needed
+            ];
+            
+            loadEpubFromPaths(paths, 0);
+        }
+        
+        function loadEpubFromPaths(paths, index) {
+            if (index >= paths.length) {
+                log('Failed to load EPUB from all paths', true);
+                return;
+            }
+            
+            const path = paths[index];
+            log(`Trying path: ${path}`);
+            
+            try {
+                if (rendition) {
+                    rendition.destroy();
+                }
+                
+                const book = ePub(path);
+                rendition = book.renderTo("viewer", {
+                    width: "100%",
+                    height: "100%",
+                    spread: "none"
+                });
+                
+                rendition.display().then(() => {
+                    log(`EPUB loaded successfully from ${path}`, false);
+                    statusEl.className = 'success';
+                }).catch(error => {
+                    log(`Failed to display from ${path}: ${error.message}`, true);
+                    loadEpubFromPaths(paths, index + 1);
+                });
+                
+                book.ready.then(() => {
+                    log('Book is ready');
+                    return book.locations.generate(500);
+                }).then(() => {
+                    log('Locations generated');
+                });
+                
+                rendition.on("relocated", function(location){
+                    log(`Page changed: ${location.start.cfi}`);
+                });
+                
+            } catch (error) {
+                log(`Error with ${path}: ${error.message}`, true);
+                loadEpubFromPaths(paths, index + 1);
+            }
+        }
+        
+        function prevPage() {
+            if (rendition) {
+                rendition.prev();
+            }
+        }
+        
+        function nextPage() {
+            if (rendition) {
+                rendition.next();
+            }
+        }
+        
+        // Test if EPUB.js loaded
+        if (typeof ePub !== 'undefined') {
+            log('✓ EPUB.js library loaded successfully');
+        } else {
+            log('✗ EPUB.js library failed to load', true);
+        }
+    </script>
+</body>
+</html>

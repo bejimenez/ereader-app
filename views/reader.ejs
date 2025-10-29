@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title><%= book.title %> - Reader</title>
+    <link rel="stylesheet" href="/css/reader.css">
+    <% if (format === 'epub') { %>
+        <!-- Primary EPUB.js CDN -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://unpkg.com/epubjs@0.3.93/dist/epub.min.js"></script>
+        <!-- Fallback if primary fails -->
+        <script>
+            if (typeof ePub === 'undefined') {
+                console.warn('Primary EPUB.js failed, loading fallback...');
+                var script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js';
+                script.onload = function() {
+                    console.log('Fallback EPUB.js loaded');
+                };
+                script.onerror = function() {
+                    console.error('All EPUB.js CDNs failed');
+                    alert('Failed to load EPUB reader library. Please refresh the page.');
+                };
+                document.head.appendChild(script);
+            }
+        </script>
+    <% } else if (format === 'pdf') { %>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <% } %>
+</head>
+<body>
+    <div class="reader-container">
+        <header class="reader-header">
+            <button class="back-btn" onclick="window.location.href='/'">← Library</button>
+            <div class="book-info">
+                <span class="book-title"><%= book.title %></span>
+                <span class="book-author"><%= book.authors.join(', ') %></span>
+            </div>
+            <button class="menu-btn" id="menuBtn">☰</button>
+        </header>
+
+        <div class="reader-menu hidden" id="readerMenu">
+            <div class="menu-section">
+                <h3>Reading Settings</h3>
+                <div class="setting-item">
+                    <label>Font Size:</label>
+                    <div class="button-group">
+                        <button id="decreaseFont">A-</button>
+                        <span id="fontSizeValue">100%</span>
+                        <button id="increaseFont">A+</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label>Theme:</label>
+                    <div class="button-group">
+                        <button class="theme-btn" data-theme="light">☀️</button>
+                        <button class="theme-btn" data-theme="sepia">📜</button>
+                        <button class="theme-btn" data-theme="dark">🌙</button>
+                    </div>
+                </div>
+                <% if (format === 'epub') { %>
+                    <div class="setting-item">
+                        <label>Reading Mode:</label>
+                        <select id="flowSelect">
+                            <option value="paginated">Paginated</option>
+                            <option value="scrolled">Scrolled</option>
+                        </select>
+                    </div>
+                <% } %>
+            </div>
+            <div class="menu-section">
+                <h3>Navigation</h3>
+                <div id="tocContainer"></div>
+            </div>
+        </div>
+
+        <div class="content-area" id="contentArea">
+            <% if (format === 'epub') { %>
+                <div id="epubViewer"></div>
+            <% } else if (format === 'pdf') { %>
+                <canvas id="pdfCanvas"></canvas>
+                <div class="pdf-text-layer" id="pdfTextLayer"></div>
+            <% } %>
+        </div>
+
+        <div class="reader-controls">
+            <button class="nav-btn" id="prevBtn">◀</button>
+            <div class="progress-info">
+                <span id="currentPage">1</span> / <span id="totalPages">1</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <button class="nav-btn" id="nextBtn">▶</button>
+        </div>
+
+        <div class="loading-indicator hidden" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>Loading book...</p>
+        </div>
+    </div>
+
+    <script>
+        const bookData = {
+            id: '<%= book.id %>',
+            title: '<%= book.title %>',
+            format: '<%= format %>',
+            path: '<%= bookPath %>',
+            alternativePath: '/epub/<%= book.id %>',  // Alternative serving method
+            savedPosition: <%= position %>
+        };
+        
+        // Debug logging
+        console.log('Book Data:', bookData);
+        
+        // Check if book path is accessible
+        if (bookData.format === 'epub') {
+            fetch(bookData.path, { method: 'HEAD' })
+                .then(response => {
+                    if (!response.ok) {
+                        console.warn('Primary path not accessible, trying alternative...');
+                        bookData.path = bookData.alternativePath;
+                    }
+                    console.log('EPUB path check:', response.ok ? 'OK' : 'Failed');
+                })
+                .catch(error => {
+                    console.error('Path check error:', error);
+                    bookData.path = bookData.alternativePath;
+                });
+        }
+    </script>
+    <script src="/js/reader.js"></script>
+</body>
+</html>
+
